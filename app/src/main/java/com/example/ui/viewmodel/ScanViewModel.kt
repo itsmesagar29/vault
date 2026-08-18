@@ -27,7 +27,7 @@ data class ReviewFormState(
     val merchantName: String = "",
     val itemName: String = "",
     val totalAmount: String = "",
-    val currency: String = "$",
+    val currency: String = "₹",
     val purchaseDateMillis: Long = System.currentTimeMillis(),
     val warrantyMonths: Int = 12,
     val warrantyExpiryDateMillis: Long = System.currentTimeMillis(),
@@ -57,68 +57,70 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
     val samplePresets = listOf(
         SampleReceiptPreset(
-            title = "Apple Store (MacBook Pro)",
+            title = "Apple Saket (iPhone 16 Pro)",
             rawText = """
-                APPLE STORE #R214
-                5th Avenue, New York, NY
-                Date: 10/14/2025
+                APPLE SAKET NEW DELHI
+                Select CITYWALK Mall, Saket
+                Date: 15/10/2025
                 --------------------------------
-                1x MacBook Pro 14" M3 Pro 512GB   $1,999.00
-                1x AppleCare+ 3-Year Protection     $279.00
+                1x iPhone 16 Pro 256GB Black     ₹1,29,900.00
+                1x AppleCare+ 2-Year Plan          ₹19,900.00
                 --------------------------------
-                SUBTOTAL:                        $2,278.00
-                TAX (8.875%):                      $202.17
-                TOTAL:                           $2,480.17
-                3 YEAR LIMITED WARRANTY INCLUDED
+                SUBTOTAL:                        ₹1,49,800.00
+                GST 18% INCLUDED
+                TOTAL:                           ₹1,49,800.00
+                2 YEAR COMPREHENSIVE WARRANTY
                 THANK YOU FOR CHOOSING APPLE
             """.trimIndent()
         ),
         SampleReceiptPreset(
-            title = "Best Buy (LG OLED 4K TV)",
+            title = "Croma (Sony 55\" 4K TV)",
             rawText = """
-                BEST BUY STORE #0981
-                SAN FRANCISCO, CA
-                PURCHASE DATE: 11/28/2025
+                CROMA ELECTRONICS #0981
+                INDIRANAGAR, BANGALORE
+                PURCHASE DATE: 28/11/2025
                 ------------------------------------
-                LG OLED 65" EVO C4 SERIES 4K TV
-                SKU: 6583921
-                PRICE: $1,696.99
+                SONY BRAVIA 55" 4K GOOGLE TV
+                MODEL: KD-55X74L
+                PRICE: ₹64,990.00
                 ------------------------------------
-                TOTAL AMOUNT: $1,696.99
+                TOTAL AMOUNT: ₹64,990.00
                 2-YEAR MANUFACTURER WARRANTY
-                GEEK SQUAD PROTECTION ELIGIBLE
+                CROMA SHIELD ELIGIBLE
                 RETAIN FOR WARRANTY CLAIMS
             """.trimIndent()
         ),
         SampleReceiptPreset(
-            title = "The Home Depot (DeWalt Combo)",
+            title = "Vijay Sales (Bosch Washing Machine)",
             rawText = """
-                THE HOME DEPOT #1042
-                CHICAGO, IL
-                DATE: 01/15/2026
+                VIJAY SALES RETAIL #1042
+                ANDHERI WEST, MUMBAI
+                DATE: 15/01/2026
                 ------------------------------------
-                DEWALT 20V MAX 2-TOOL DRILL KIT
-                MODEL: DCK280C2
-                PRICE: $229.00
+                BOSCH 8KG FRONT LOAD WASHER
+                MODEL: WAJ2846WIN
+                PRICE: ₹36,990.00
                 ------------------------------------
-                TOTAL: $229.00
-                3 YEAR LIMITED WARRANTY
-                FREE 1 YEAR SERVICE CONTRACT
-                REGISTER AT WWW.DEWALT.COM
+                TOTAL: ₹36,990.00
+                3 YEAR COMPREHENSIVE WARRANTY
+                10 YEAR MOTOR WARRANTY
+                REGISTER AT WWW.BOSCH-HOME.IN
             """.trimIndent()
         ),
         SampleReceiptPreset(
-            title = "IKEA (Ergonomic Chair)",
+            title = "Decathlon (Triban Road Bike)",
             rawText = """
-                IKEA EMERYVILLE
-                DATE: 04/05/2025
+                DECATHLON SPORTS INDIA
+                SECTOR 29, GURUGRAM
+                DATE: 05/04/2025
                 ------------------------------------
-                MARKUS OFFICE CHAIR BLACK
-                ART.NO: 702.611.50
-                AMOUNT: $289.99
+                TRIBAN RC100 ROAD BIKE 7-SPEED
+                ITEM CODE: 8544956
+                AMOUNT: ₹24,999.00
                 ------------------------------------
-                TOTAL: $289.99
-                10-YEAR GUARANTEE INCLUDED
+                TOTAL: ₹24,999.00
+                LIFETIME FRAME WARRANTY
+                2 YEAR PARTS WARRANTY
                 KEEP RECEIPT AS PROOF OF PURCHASE
             """.trimIndent()
         )

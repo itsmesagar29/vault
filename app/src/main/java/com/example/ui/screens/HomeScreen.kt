@@ -33,6 +33,8 @@ import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -60,12 +62,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
 import com.example.domain.model.ReceiptItem
+import com.example.domain.model.WarrantyStatus
 import com.example.ui.components.CategoryChips
 import com.example.ui.components.ExpiringSoonSection
 import com.example.ui.components.ReceiptCard
 import com.example.ui.components.StatSummaryCards
 import com.example.ui.theme.BrandAccent
 import com.example.ui.theme.BrandPrimary
+import com.example.ui.theme.StatusActive
+import com.example.ui.theme.StatusExpired
+import com.example.ui.theme.StatusExpiringSoon
 import com.example.ui.viewmodel.ReceiptViewModel
 import com.example.ui.viewmodel.SortOption
 
@@ -266,6 +272,75 @@ fun HomeScreen(
                         selectedCategory = uiState.selectedCategory,
                         onCategorySelected = { viewModel.onCategorySelected(it) }
                     )
+                }
+            }
+
+            // Quick Warranty Status Filter Bar
+            item {
+                Column {
+                    Text(
+                        text = "Filter by Warranty Status",
+                        style = MaterialTheme.typography.titleSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        // All Chip
+                        FilterChip(
+                            selected = uiState.selectedStatusFilter == null,
+                            onClick = { viewModel.onStatusFilterSelected(null) },
+                            label = { Text("All", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                            shape = RoundedCornerShape(10.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = BrandPrimary,
+                                selectedLabelColor = Color.White
+                            ),
+                            modifier = Modifier.weight(1f).testTag("status_filter_all")
+                        )
+
+                        // Active Chip
+                        FilterChip(
+                            selected = uiState.selectedStatusFilter == WarrantyStatus.ACTIVE,
+                            onClick = { viewModel.onStatusFilterSelected(WarrantyStatus.ACTIVE) },
+                            label = { Text("Active", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                            shape = RoundedCornerShape(10.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = StatusActive,
+                                selectedLabelColor = Color.White
+                            ),
+                            modifier = Modifier.weight(1f).testTag("status_filter_active")
+                        )
+
+                        // Expiring Soon Chip
+                        FilterChip(
+                            selected = uiState.selectedStatusFilter == WarrantyStatus.EXPIRING_SOON,
+                            onClick = { viewModel.onStatusFilterSelected(WarrantyStatus.EXPIRING_SOON) },
+                            label = { Text("Expiring", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                            shape = RoundedCornerShape(10.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = StatusExpiringSoon,
+                                selectedLabelColor = Color.White
+                            ),
+                            modifier = Modifier.weight(1f).testTag("status_filter_expiring")
+                        )
+
+                        // Expired Chip
+                        FilterChip(
+                            selected = uiState.selectedStatusFilter == WarrantyStatus.EXPIRED,
+                            onClick = { viewModel.onStatusFilterSelected(WarrantyStatus.EXPIRED) },
+                            label = { Text("Expired", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
+                            shape = RoundedCornerShape(10.dp),
+                            colors = FilterChipDefaults.filterChipColors(
+                                selectedContainerColor = StatusExpired,
+                                selectedLabelColor = Color.White
+                            ),
+                            modifier = Modifier.weight(1f).testTag("status_filter_expired")
+                        )
+                    }
                 }
             }
 

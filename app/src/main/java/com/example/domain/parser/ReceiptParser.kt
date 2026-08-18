@@ -11,10 +11,11 @@ import java.util.regex.Pattern
 object ReceiptParser {
 
     private val KNOWN_MERCHANTS = listOf(
-        "Apple Store", "Apple", "Best Buy", "Target", "Walmart", "Home Depot",
-        "Lowe's", "Costco", "Amazon", "IKEA", "B&H Photo", "Micro Center",
-        "Samsung", "Sony Store", "AutoZone", "Nike Store", "Zara", "Staples",
-        "Office Depot", "Wayfair", "Sephora", "Nordstrom", "Macy's", "Target Store"
+        "Reliance Digital", "Croma", "Vijay Sales", "Apple BKC", "Apple Saket", "Apple Store",
+        "Apple", "Samsung Smart Café", "Samsung Store", "Samsung", "Flipkart", "Amazon",
+        "Decathlon", "IKEA", "Tanishq", "Zudio", "Tata CLiQ", "OnePlus Store", "Mi Home",
+        "Poorvika", "Sangeetha Mobiles", "Best Buy", "Target", "Walmart", "Home Depot",
+        "Lowe's", "Costco", "B&H Photo", "Micro Center", "Sony Store", "Nike Store", "Zara"
     )
 
     private val DATE_FORMATS = listOf(
@@ -148,9 +149,28 @@ object ReceiptParser {
         return clean.toDoubleOrNull()
     }
 
+    private fun normalizeCurrency(symbol: String?): String {
+        if (symbol == null || symbol.isEmpty()) return "₹"
+        val upper = symbol.trim().uppercase()
+        return when {
+            upper.contains("₹") || upper.contains("RS") || upper.contains("INR") || upper == "/-" -> "₹"
+            upper.contains("$") -> "$"
+            upper.contains("€") -> "€"
+            upper.contains("£") -> "£"
+            upper.contains("¥") -> "¥"
+            else -> "₹"
+        }
+    }
+
     private fun extractTotalAmount(lines: List<String>): Pair<Double?, String> {
-        val totalKeywords = listOf("GRAND TOTAL", "TOTAL AMOUNT", "TOTAL DUE", "BALANCE DUE", "TOTAL", "AMOUNT DUE", "AMOUNT PAID", "SUBTOTAL")
-        val amountPattern = Pattern.compile("""([$€£¥₹]?)\s*([0-9]{1,3}(?:[,\.][0-9]{3})*(?:[,\.][0-9]{2})|[0-9]+[.,][0-9]{2}|[0-9]+)""")
+        val totalKeywords = listOf(
+            "GRAND TOTAL", "NET TOTAL", "TOTAL AMOUNT", "TOTAL DUE", "BALANCE DUE",
+            "TOTAL", "AMOUNT DUE", "AMOUNT PAID", "INVOICE TOTAL", "SUBTOTAL"
+        )
+        val amountPattern = Pattern.compile(
+            """(?:(₹|Rs\.?|INR|[$€£¥])\s*)?([0-9]{1,3}(?:[,\.][0-9]{2,3})*(?:[,\.][0-9]{2})|[0-9]+[.,][0-9]{2}|[0-9]+)\s*(?:(\/-|Rs\.?|INR))?""",
+            Pattern.CASE_INSENSITIVE
+        )
 
         // Search lines from bottom up or lines matching total keywords
         for (line in lines.reversed()) {
@@ -159,14 +179,16 @@ object ReceiptParser {
                 if (upper.contains(keyword)) {
                     val matcher = amountPattern.matcher(line)
                     var lastFoundAmount: Double? = null
-                    var lastFoundSymbol = "$"
+                    var lastFoundSymbol = "₹"
                     while (matcher.find()) {
-                        val symbol = matcher.group(1)?.ifEmpty { "$" } ?: "$"
+                        val prefixSymbol = matcher.group(1)
+                        val postfixSymbol = matcher.group(3)
+                        val sym = prefixSymbol ?: postfixSymbol ?: "₹"
                         val rawNum = matcher.group(2) ?: ""
                         val num = parseAmountString(rawNum)
                         if (num != null && num > 0) {
                             lastFoundAmount = num
-                            lastFoundSymbol = symbol
+                            lastFoundSymbol = normalizeCurrency(sym)
                         }
                     }
                     if (lastFoundAmount != null) {
@@ -176,18 +198,20 @@ object ReceiptParser {
             }
         }
 
-        // Fallback: find the largest dollar amount in the document
+        // Fallback: find the largest amount in the document
         var maxAmount: Double? = null
-        var foundCurrency = "$"
+        var foundCurrency = "₹"
         for (line in lines) {
             val matcher = amountPattern.matcher(line)
             while (matcher.find()) {
-                val symbol = matcher.group(1)?.ifEmpty { "$" } ?: "$"
+                val prefixSymbol = matcher.group(1)
+                val postfixSymbol = matcher.group(3)
+                val sym = prefixSymbol ?: postfixSymbol ?: "₹"
                 val rawNum = matcher.group(2) ?: ""
                 val num = parseAmountString(rawNum)
                 if (num != null && (maxAmount == null || num > maxAmount)) {
                     maxAmount = num
-                    foundCurrency = symbol
+                    foundCurrency = normalizeCurrency(sym)
                 }
             }
         }

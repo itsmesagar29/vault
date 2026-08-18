@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ReceiptVault</string>
+    <string name="app_name">BillVault</string>
     <string name="title_expiring_soon">Expiring Soon</string>
     <string name="title_all_receipts">All Receipts</string>
     <string name="title_scan_receipt">Scan Receipt</string>

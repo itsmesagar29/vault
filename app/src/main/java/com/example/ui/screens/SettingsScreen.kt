@@ -20,11 +20,15 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.DeleteSweep
+import androidx.compose.material.icons.filled.DataObject
+import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.NotificationsActive
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.filled.TableChart
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -61,6 +65,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.R
+import com.example.data.exporter.ExportHelper
 import com.example.ui.theme.BrandAccent
 import com.example.ui.theme.BrandPrimary
 import com.example.ui.theme.StatusExpired
@@ -79,6 +84,7 @@ fun SettingsScreen(
     val reminderDays by viewModel.reminderDaysBefore.collectAsState()
     val defaultCurrency by viewModel.defaultCurrency.collectAsState()
     val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
+    val allReceipts by viewModel.allReceipts.collectAsState()
 
     val scrollState = rememberScrollState()
     var showClearDialog by remember { mutableStateOf(false) }
@@ -315,7 +321,7 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        listOf("$", "€", "£", "¥", "₹").forEach { sym ->
+                        listOf("₹", "$", "€", "£", "¥").forEach { sym ->
                             FilterChip(
                                 selected = defaultCurrency == sym,
                                 onClick = { viewModel.setDefaultCurrency(sym) },
@@ -327,6 +333,102 @@ fun SettingsScreen(
                                 ),
                                 modifier = Modifier.weight(1f)
                             )
+                        }
+                    }
+                }
+            }
+
+            // Vault Backup & Data Export Section
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                imageVector = Icons.Default.FileDownload,
+                                contentDescription = null,
+                                tint = BrandPrimary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Vault Export & Backup",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = BrandPrimary.copy(alpha = 0.12f)
+                        ) {
+                            Text(
+                                text = "${allReceipts.size} Records",
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = BrandPrimary,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = "Export your receipt records and warranty certificates for tax claims, insurance dossiers, or spreadsheet backups.",
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        lineHeight = 16.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(14.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        OutlinedButton(
+                            onClick = {
+                                if (allReceipts.isEmpty()) {
+                                    Toast.makeText(context, "No receipts to export", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    val csvData = ExportHelper.generateCsv(allReceipts)
+                                    ExportHelper.shareText(context, csvData, "Export Receipts (CSV)")
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("export_csv_btn"),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.TableChart, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("Export CSV", fontSize = 12.sp)
+                        }
+
+                        OutlinedButton(
+                            onClick = {
+                                if (allReceipts.isEmpty()) {
+                                    Toast.makeText(context, "No receipts to export", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    val jsonData = ExportHelper.generateJson(allReceipts)
+                                    ExportHelper.shareText(context, jsonData, "Export Vault Backup (JSON)")
+                                }
+                            },
+                            modifier = Modifier
+                                .weight(1f)
+                                .testTag("export_json_btn"),
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Icon(imageVector = Icons.Default.DataObject, contentDescription = null, modifier = Modifier.size(16.dp))
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text("JSON Backup", fontSize = 12.sp)
                         }
                     }
                 }
@@ -395,14 +497,14 @@ fun SettingsScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = "About ReceiptVault",
+                            text = "About BillVault",
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold
                         )
                     }
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
-                        text = "ReceiptVault v1.0\n• On-Device OCR via Google ML Kit Text Recognition\n• CameraX preview & image capture\n• Room Database SQLite local storage\n• WorkManager automated expiry notification reminders\n• 100% Private on-device processing.",
+                        text = "BillVault v1.0\n• On-Device OCR via Google ML Kit Text Recognition\n• CameraX preview & image capture\n• Room Database SQLite local storage\n• WorkManager automated expiry notification reminders\n• 100% Private on-device processing.",
                         fontSize = 12.sp,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         lineHeight = 18.sp

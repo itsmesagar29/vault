@@ -10,7 +10,7 @@ data class ReceiptItem(
     val merchantName: String,
     val itemName: String,
     val totalAmount: Double,
-    val currency: String = "$",
+    val currency: String = "₹",
     val purchaseDateMillis: Long,
     val warrantyMonths: Int,
     val warrantyExpiryDateMillis: Long,

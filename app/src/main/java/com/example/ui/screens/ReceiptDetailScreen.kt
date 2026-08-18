@@ -69,6 +69,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.R
 import com.example.domain.model.ReceiptItem
+import com.example.ui.components.DigitalWarrantyPassDialog
 import com.example.ui.components.ReceiptImageViewerDialog
 import com.example.ui.components.WarrantyBadge
 import com.example.ui.components.WarrantyTimeline
@@ -95,6 +96,7 @@ fun ReceiptDetailScreen(
 
     var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     var showFullImageViewer by remember { mutableStateOf(false) }
+    var showDigitalPassDialog by remember { mutableStateOf(false) }
 
     val receipt = receiptState
 
@@ -397,6 +399,83 @@ fun ReceiptDetailScreen(
                     }
                 }
 
+                // Digital Warranty Pass & Claim CTA Banner
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = Color.Transparent,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(16.dp))
+                        .clickable { showDigitalPassDialog = true }
+                        .testTag("open_digital_pass_btn")
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                brush = androidx.compose.ui.graphics.Brush.horizontalGradient(
+                                    listOf(Color(0xFF1E3A8A), Color(0xFF0F172A))
+                                )
+                            )
+                            .padding(16.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .clip(CircleShape)
+                                        .background(BrandAccent.copy(alpha = 0.2f)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Security,
+                                        contentDescription = null,
+                                        tint = BrandAccent,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = "Digital Warranty Pass",
+                                        fontSize = 15.sp,
+                                        fontWeight = FontWeight.ExtraBold,
+                                        color = Color.White
+                                    )
+                                    Text(
+                                        text = "Official certificate, hotline & claim hub",
+                                        fontSize = 11.sp,
+                                        color = Color(0xFF94A3B8)
+                                    )
+                                }
+                            }
+
+                            Surface(
+                                shape = RoundedCornerShape(20.dp),
+                                color = BrandAccent.copy(alpha = 0.2f),
+                                border = androidx.compose.foundation.BorderStroke(1.dp, BrandAccent)
+                            ) {
+                                Text(
+                                    text = "OPEN PASS",
+                                    fontSize = 10.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = BrandAccent,
+                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    letterSpacing = 1.sp
+                                )
+                            }
+                        }
+                    }
+                }
+
                 // Quick Action Buttons (Test Notification & Share)
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -477,6 +556,14 @@ fun ReceiptDetailScreen(
         ReceiptImageViewerDialog(
             imagePath = receipt!!.imagePath!!,
             onDismiss = { showFullImageViewer = false }
+        )
+    }
+
+    // Digital Warranty Pass & Claim Dialog
+    if (showDigitalPassDialog && receipt != null) {
+        DigitalWarrantyPassDialog(
+            receipt = receipt,
+            onDismiss = { showDigitalPassDialog = false }
         )
     }
 }

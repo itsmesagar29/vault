@@ -35,6 +35,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
@@ -317,27 +319,49 @@ fun ReviewScreen(
                 )
 
                 // Currency selector
-                val currencies = listOf("$", "€", "£", "¥", "₹")
+                val currencies = listOf("₹", "$", "€", "£", "¥")
                 var showCurrencyMenu by remember { mutableStateOf(false) }
-                Surface(
-                    modifier = Modifier
-                        .padding(top = 8.dp)
-                        .height(54.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .clickable { showCurrencyMenu = !showCurrencyMenu },
-                    shape = RoundedCornerShape(12.dp),
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                ) {
-                    Box(
-                        modifier = Modifier.padding(horizontal = 14.dp),
-                        contentAlignment = Alignment.Center
+                Box {
+                    Surface(
+                        modifier = Modifier
+                            .padding(top = 8.dp)
+                            .height(54.dp)
+                            .clip(RoundedCornerShape(12.dp))
+                            .clickable { showCurrencyMenu = true },
+                        shape = RoundedCornerShape(12.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                     ) {
-                        Text(
-                            text = form.currency,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = BrandPrimary
-                        )
+                        Box(
+                            modifier = Modifier.padding(horizontal = 14.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = form.currency,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = BrandPrimary
+                            )
+                        }
+                    }
+
+                    DropdownMenu(
+                        expanded = showCurrencyMenu,
+                        onDismissRequest = { showCurrencyMenu = false }
+                    ) {
+                        currencies.forEach { curr ->
+                            DropdownMenuItem(
+                                text = {
+                                    Text(
+                                        text = curr,
+                                        fontWeight = if (form.currency == curr) FontWeight.Bold else FontWeight.Normal
+                                    )
+                                },
+                                onClick = {
+                                    scanViewModel.updateCurrency(curr)
+                                    showCurrencyMenu = false
+                                }
+                            )
+                        }
                     }
                 }
             }

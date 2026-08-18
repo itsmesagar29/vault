@@ -19,7 +19,7 @@ data class VaultStats(
     val expiringSoonCount: Int = 0,
     val expiredCount: Int = 0,
     val totalVaultValue: Double = 0.0,
-    val currency: String = "$"
+    val currency: String = "₹"
 )
 
 class ReceiptRepository(private val context: Context) {
@@ -69,7 +69,7 @@ class ReceiptRepository(private val context: Context) {
             expiringSoonCount = expiring,
             expiredCount = expired,
             totalVaultValue = totalValue,
-            currency = domainItems.firstOrNull()?.currency ?: "$"
+            currency = domainItems.firstOrNull()?.currency ?: "₹"
         )
     }
 
@@ -132,7 +132,7 @@ class ReceiptRepository(private val context: Context) {
         val vacuumPurchase = cal.timeInMillis
         val vacuumExpiry = ReceiptParser.calculateExpiryDate(vacuumPurchase, 12)
 
-        // 4. Expired item (purchased 14 months ago, 12 mo warranty)
+        // 4. Expired item (purchased 14 months ago, 3 mo warranty)
         cal.timeInMillis = now
         cal.add(Calendar.MONTH, -14)
         val jacketPurchase = cal.timeInMillis
@@ -146,17 +146,17 @@ class ReceiptRepository(private val context: Context) {
 
         val samples = listOf(
             ReceiptEntity(
-                merchantName = "Apple Store",
-                itemName = "MacBook Pro 16\" M3 Max",
-                totalAmount = 2499.00,
-                currency = "$",
+                merchantName = "Apple BKC",
+                itemName = "MacBook Pro 14\" M3 Pro",
+                totalAmount = 199900.00,
+                currency = "₹",
                 purchaseDateMillis = macbookPurchase,
                 warrantyMonths = 24,
                 warrantyExpiryDateMillis = macbookExpiry,
                 category = ReceiptCategory.ELECTRONICS.name,
-                notes = "AppleCare+ 2-Year Plan included. Covers accidental damage.",
+                notes = "AppleCare+ 2-Year Protection Plan included. Covers accidental damage.",
                 imagePath = null,
-                rawOcrText = "APPLE STORE #R102\nMACBOOK PRO 16-INCH M3 MAX\nAPPLECARE+ 2 YR WARRANTY\nSUBTOTAL: $2,499.00\nTAX: $206.17\nTOTAL: $2,705.17\nTHANK YOU FOR SHOPPING AT APPLE",
+                rawOcrText = "APPLE BKC MUMBAI\nMACBOOK PRO 14-INCH M3 PRO\nAPPLECARE+ 2 YR WARRANTY\nSUBTOTAL: ₹1,99,900.00\nGST 18%: ₹35,982.00\nTOTAL: ₹2,35,882.00\nTHANK YOU FOR SHOPPING AT APPLE BKC",
                 confidenceScore = 0.96f,
                 reminderEnabled = true,
                 reminderDaysBefore = 7,
@@ -164,17 +164,17 @@ class ReceiptRepository(private val context: Context) {
                 updatedAt = now
             ),
             ReceiptEntity(
-                merchantName = "Best Buy",
-                itemName = "Sony 65\" Bravia XR OLED 4K TV",
-                totalAmount = 1799.99,
-                currency = "$",
+                merchantName = "Croma",
+                itemName = "Sony 55\" Bravia 4K Google TV",
+                totalAmount = 64990.00,
+                currency = "₹",
                 purchaseDateMillis = tvPurchase,
                 warrantyMonths = 24,
                 warrantyExpiryDateMillis = tvExpiry,
                 category = ReceiptCategory.APPLIANCES.name,
-                notes = "Geek Squad 2-Year Protection Plan with in-home repair.",
+                notes = "2-Year Comprehensive Manufacturer Warranty + 1 Year Extended Croma Shield.",
                 imagePath = null,
-                rawOcrText = "BEST BUY STORE #0412\nSONY 65 INCH BRAVIA XR OLED TV\nMODEL: XR-65A80L\n2 YEAR EXTENDED WARRANTY INCLUDED\nTOTAL: $1,799.99\nAUTH CODE: 489211",
+                rawOcrText = "CROMA ELECTRONICS #0412\nSONY 55 INCH BRAVIA 4K SMART TV\nMODEL: KD-55X74L\n2 YEAR EXTENDED WARRANTY INCLUDED\nTOTAL: ₹64,990.00\nINVOICE: CR-984122",
                 confidenceScore = 0.94f,
                 reminderEnabled = true,
                 reminderDaysBefore = 14,
@@ -182,17 +182,17 @@ class ReceiptRepository(private val context: Context) {
                 updatedAt = now
             ),
             ReceiptEntity(
-                merchantName = "Dyson",
-                itemName = "Dyson V15 Detect Cordless Vacuum",
-                totalAmount = 649.99,
-                currency = "$",
+                merchantName = "Dyson India",
+                itemName = "Dyson V12 Detect Slim Vacuum",
+                totalAmount = 45900.00,
+                currency = "₹",
                 purchaseDateMillis = vacuumPurchase,
                 warrantyMonths = 12,
                 warrantyExpiryDateMillis = vacuumExpiry,
                 category = ReceiptCategory.APPLIANCES.name,
-                notes = "1-Year Manufacturer Warranty on motor & battery.",
+                notes = "1-Year Official Manufacturer Warranty on motor, battery, and attachments.",
                 imagePath = null,
-                rawOcrText = "DYSON DIRECT STORE\nDYSON V15 DETECT CORDLESS VACUUM\n1 YEAR LIMITED WARRANTY\nAMOUNT: $649.99\nPAYMENT: VISA ENDING 4019",
+                rawOcrText = "DYSON INDIA STORE\nDYSON V12 DETECT SLIM VACUUM\n1 YEAR LIMITED WARRANTY\nAMOUNT: ₹45,900.00\nPAYMENT: UPI HDFC",
                 confidenceScore = 0.91f,
                 reminderEnabled = true,
                 reminderDaysBefore = 7,
@@ -200,17 +200,17 @@ class ReceiptRepository(private val context: Context) {
                 updatedAt = now
             ),
             ReceiptEntity(
-                merchantName = "The Home Depot",
-                itemName = "DeWalt 20V MAX Brushless Hammer Drill Kit",
-                totalAmount = 299.00,
-                currency = "$",
+                merchantName = "Vijay Sales",
+                itemName = "Bosch 8kg Front Load Washing Machine",
+                totalAmount = 36990.00,
+                currency = "₹",
                 purchaseDateMillis = drillPurchase,
                 warrantyMonths = 36,
                 warrantyExpiryDateMillis = drillExpiry,
-                category = ReceiptCategory.TOOLS.name,
-                notes = "3-Year Limited Warranty, 1-Year Free Service.",
+                category = ReceiptCategory.APPLIANCES.name,
+                notes = "3-Year Comprehensive Warranty, 10-Year Motor Warranty.",
                 imagePath = null,
-                rawOcrText = "THE HOME DEPOT #6819\nDEWALT 20V MAX CORDLESS DRILL COMBO\n3 YEAR LIMITED WARRANTY INCLUDED\nTOTAL: $299.00\nREGISTER AT DEWALT.COM",
+                rawOcrText = "VIJAY SALES RETAIL #6819\nBOSCH 8KG FRONT LOAD WASHER\n3 YEAR COMPREHENSIVE WARRANTY\nTOTAL: ₹36,990.00\nREGISTER AT BOSCH-HOME.IN",
                 confidenceScore = 0.95f,
                 reminderEnabled = true,
                 reminderDaysBefore = 30,
@@ -218,17 +218,17 @@ class ReceiptRepository(private val context: Context) {
                 updatedAt = now
             ),
             ReceiptEntity(
-                merchantName = "Patagonia",
-                itemName = "Nano Puff Insulated Jacket",
-                totalAmount = 239.00,
-                currency = "$",
+                merchantName = "Decathlon",
+                itemName = "Triban RC100 Road Bike",
+                totalAmount = 24999.00,
+                currency = "₹",
                 purchaseDateMillis = jacketPurchase,
                 warrantyMonths = 3,
                 warrantyExpiryDateMillis = jacketExpiry,
-                category = ReceiptCategory.CLOTHING.name,
-                notes = "3-Month store return warranty, Ironclad guarantee for repairs.",
+                category = ReceiptCategory.VEHICLES.name,
+                notes = "3-Month Free Service Checkup, Lifetime warranty on frame.",
                 imagePath = null,
-                rawOcrText = "PATAGONIA SOHO\nNANO PUFF JACKET BLACK M\nPRICE: $239.00\nTAX: $21.21\nTOTAL: $260.21\nIRONCLAD GUARANTEE",
+                rawOcrText = "DECATHLON SPORTS INDIA\nTRIBAN RC100 ROAD BIKE\nPRICE: ₹24,999.00\nGST INCLUDED\nTOTAL: ₹24,999.00\nKEEP INVOICE FOR WARRANTY",
                 confidenceScore = 0.88f,
                 reminderEnabled = true,
                 reminderDaysBefore = 7,

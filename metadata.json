@@ -1,6 +1,6 @@
 {
-  "name": "ReceiptVault",
-  "description": "Smart receipt scanner, OCR text extractor, and warranty expiry tracker with proactive alerts.",
+  "name": "BillVault",
+  "description": "Smart receipt & bill scanner, OCR text extractor, and warranty expiry tracker with proactive alerts.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

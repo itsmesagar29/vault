@@ -56,7 +56,7 @@ object NotificationHelper {
             .setContentText("${receipt.itemName} warranty $timeText")
             .setStyle(
                 NotificationCompat.BigTextStyle()
-                    .bigText("Your warranty for '${receipt.itemName}' ($${String.format("%.2f", receipt.totalAmount)}) from ${receipt.merchantName} $timeText. Tap to view receipt and warranty proof.")
+                    .bigText("Your warranty for '${receipt.itemName}' (${receipt.formattedAmount}) from ${receipt.merchantName} $timeText. Tap to view receipt and warranty proof.")
             )
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pendingIntent)

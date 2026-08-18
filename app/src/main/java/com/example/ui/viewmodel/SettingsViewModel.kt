@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.data.preferences.UserPreferencesRepository
 import com.example.data.repository.ReceiptRepository
+import com.example.domain.model.ReceiptItem
 import com.example.worker.NotificationHelper
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -14,6 +15,12 @@ import kotlinx.coroutines.launch
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
     private val userPrefs = UserPreferencesRepository(application)
     private val repository = ReceiptRepository(application)
+
+    val allReceipts: StateFlow<List<ReceiptItem>> = repository.allReceipts.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = emptyList()
+    )
 
     val themeMode: StateFlow<String> = userPrefs.themeMode.stateIn(
         scope = viewModelScope,
@@ -78,7 +85,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun triggerTestNotification() {
         NotificationHelper.showTestNotification(
             getApplication(),
-            "🔔 ReceiptVault Reminder Alert",
+            "🔔 BillVault Reminder Alert",
             "Your 2-Year Warranty for 'MacBook Pro' is expiring in 5 days! Tap to view claim details."
         )
     }

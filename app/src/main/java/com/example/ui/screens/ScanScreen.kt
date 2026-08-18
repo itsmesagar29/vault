@@ -510,10 +510,14 @@ private fun imageProxyToBitmap(image: ImageProxy): Bitmap {
     buffer.get(bytes)
     val bitmap = android.graphics.BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
     val rotationDegrees = image.imageInfo.rotationDegrees
-    return if (rotationDegrees != 0) {
+    return if (rotationDegrees != 0 && bitmap != null) {
         val matrix = Matrix().apply { postRotate(rotationDegrees.toFloat()) }
-        Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        val rotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+        if (rotated != bitmap) {
+            bitmap.recycle()
+        }
+        rotated
     } else {
-        bitmap
+        bitmap ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     }
 }

@@ -37,7 +37,7 @@ class UserPreferencesRepository(private val context: Context) {
     }
 
     val defaultCurrency: Flow<String> = context.dataStore.data.map { preferences ->
-        preferences[PreferencesKeys.DEFAULT_CURRENCY] ?: "$"
+        preferences[PreferencesKeys.DEFAULT_CURRENCY] ?: "₹"
     }
 
     val notificationsEnabled: Flow<Boolean> = context.dataStore.data.map { preferences ->
