@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">ReceiptVault</string>
+    <string name="title_expiring_soon">Expiring Soon</string>
+    <string name="title_all_receipts">All Receipts</string>
+    <string name="title_scan_receipt">Scan Receipt</string>
+    <string name="title_review_receipt">Review &amp; Confirm</string>
+    <string name="title_receipt_detail">Receipt Details</string>
+    <string name="title_analytics">Vault Analytics</string>
+    <string name="title_settings">Settings</string>
+    <string name="action_scan">Scan</string>
+    <string name="action_save">Save Receipt</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_share">Share Receipt</string>
+    <string name="search_placeholder">Search merchant, items, notes...</string>
+    <string name="warranty_active">Active Warranty</string>
+    <string name="warranty_expiring_soon">Expiring Soon</string>
+    <string name="warranty_expired">Expired</string>
+</resources>
