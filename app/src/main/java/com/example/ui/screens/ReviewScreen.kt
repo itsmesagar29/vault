@@ -295,76 +295,24 @@ fun ReviewScreen(
                 )
             )
 
-            // Total Amount & Currency Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ) {
-                OutlinedTextField(
-                    value = form.totalAmount,
-                    onValueChange = { scanViewModel.updateTotalAmount(it) },
-                    label = { Text("Total Amount") },
-                    prefix = { Text("${form.currency} ") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier
-                        .weight(1f)
-                        .testTag("total_amount_input"),
-                    singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = BrandPrimary,
-                        unfocusedContainerColor = MaterialTheme.colorScheme.surface,
-                        focusedContainerColor = MaterialTheme.colorScheme.surface
-                    )
+            // Total Amount Row (Fixed in INR ₹)
+            OutlinedTextField(
+                value = form.totalAmount,
+                onValueChange = { scanViewModel.updateTotalAmount(it) },
+                label = { Text("Total Amount (₹)") },
+                prefix = { Text("₹ ", fontWeight = FontWeight.Bold, color = BrandPrimary) },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("total_amount_input"),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = BrandPrimary,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surface,
+                    focusedContainerColor = MaterialTheme.colorScheme.surface
                 )
-
-                // Currency selector
-                val currencies = listOf("₹", "$", "€", "£", "¥")
-                var showCurrencyMenu by remember { mutableStateOf(false) }
-                Box {
-                    Surface(
-                        modifier = Modifier
-                            .padding(top = 8.dp)
-                            .height(54.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .clickable { showCurrencyMenu = true },
-                        shape = RoundedCornerShape(12.dp),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
-                    ) {
-                        Box(
-                            modifier = Modifier.padding(horizontal = 14.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = form.currency,
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = BrandPrimary
-                            )
-                        }
-                    }
-
-                    DropdownMenu(
-                        expanded = showCurrencyMenu,
-                        onDismissRequest = { showCurrencyMenu = false }
-                    ) {
-                        currencies.forEach { curr ->
-                            DropdownMenuItem(
-                                text = {
-                                    Text(
-                                        text = curr,
-                                        fontWeight = if (form.currency == curr) FontWeight.Bold else FontWeight.Normal
-                                    )
-                                },
-                                onClick = {
-                                    scanViewModel.updateCurrency(curr)
-                                    showCurrencyMenu = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
+            )
 
             // Purchase Date Picker Row
             Surface(

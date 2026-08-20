@@ -106,6 +106,8 @@ class ReceiptViewModel(application: Application) : AndroidViewModel(application)
                 repository.seedSampleReceiptsIfEmpty()
                 userPrefs.setInitialSampleSeeded(true)
             }
+            // Ensure any legacy seeded receipts or items are always synced to Rupee currency
+            repository.updateAllCurrencies("₹")
         }
     }
 
