@@ -82,7 +82,6 @@ fun SettingsScreen(
     val themeMode by viewModel.themeMode.collectAsState()
     val defaultWarranty by viewModel.defaultWarrantyMonths.collectAsState()
     val reminderDays by viewModel.reminderDaysBefore.collectAsState()
-    val defaultCurrency by viewModel.defaultCurrency.collectAsState()
     val notificationsEnabled by viewModel.notificationsEnabled.collectAsState()
     val allReceipts by viewModel.allReceipts.collectAsState()
 
@@ -298,34 +297,6 @@ fun SettingsScreen(
                                 selected = defaultWarranty == months,
                                 onClick = { viewModel.setDefaultWarrantyMonths(months) },
                                 label = { Text(label, fontSize = 12.sp) },
-                                shape = RoundedCornerShape(8.dp),
-                                colors = FilterChipDefaults.filterChipColors(
-                                    selectedContainerColor = BrandPrimary,
-                                    selectedLabelColor = Color.White
-                                ),
-                                modifier = Modifier.weight(1f)
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.height(14.dp))
-
-                    Text(
-                        text = "Currency Symbol",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        listOf("₹", "$", "€", "£", "¥").forEach { sym ->
-                            FilterChip(
-                                selected = defaultCurrency == sym,
-                                onClick = { viewModel.setDefaultCurrency(sym) },
-                                label = { Text(sym, fontSize = 14.sp, fontWeight = FontWeight.Bold) },
                                 shape = RoundedCornerShape(8.dp),
                                 colors = FilterChipDefaults.filterChipColors(
                                     selectedContainerColor = BrandPrimary,

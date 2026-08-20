@@ -69,6 +69,9 @@ interface ReceiptDao {
     @Query("DELETE FROM receipts")
     suspend fun clearAllReceipts()
 
+    @Query("UPDATE receipts SET currency = :currency")
+    suspend fun updateAllCurrencies(currency: String)
+
     @Query("SELECT COUNT(*) FROM receipts")
     fun getReceiptCount(): Flow<Int>
 }

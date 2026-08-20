@@ -55,6 +55,16 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     private val _reviewForm = MutableStateFlow(ReviewFormState())
     val reviewForm: StateFlow<ReviewFormState> = _reviewForm
 
+    init {
+        viewModelScope.launch {
+            userPrefs.defaultCurrency.collect { curr ->
+                if (_scanStatus.value is ScanStatus.Idle && _reviewForm.value.merchantName.isBlank() && _reviewForm.value.totalAmount.isBlank()) {
+                    _reviewForm.value = _reviewForm.value.copy(currency = curr)
+                }
+            }
+        }
+    }
+
     val samplePresets = listOf(
         SampleReceiptPreset(
             title = "Apple Saket (iPhone 16 Pro)",
@@ -130,8 +140,9 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         _scanStatus.value = ScanStatus.Processing
         viewModelScope.launch {
             val defaultWarranty = userPrefs.defaultWarrantyMonths.first()
+            val defaultCurrency = userPrefs.defaultCurrency.first()
             val savedPath = ocrEngine.saveBitmapToInternalStorage(bitmap)
-            val result = ocrEngine.recognizeAndParse(bitmap, defaultWarranty)
+            val result = ocrEngine.recognizeAndParse(bitmap, defaultWarranty, defaultCurrency)
             
             result.onSuccess { parsed ->
                 _scanStatus.value = ScanStatus.Success(parsed)
@@ -146,7 +157,8 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         _scanStatus.value = ScanStatus.Processing
         viewModelScope.launch {
             val defaultWarranty = userPrefs.defaultWarrantyMonths.first()
-            val result = ocrEngine.recognizeAndParse(uri, defaultWarranty)
+            val defaultCurrency = userPrefs.defaultCurrency.first()
+            val result = ocrEngine.recognizeAndParse(uri, defaultWarranty, defaultCurrency)
             
             result.onSuccess { parsed ->
                 _scanStatus.value = ScanStatus.Success(parsed)
@@ -161,7 +173,8 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         _scanStatus.value = ScanStatus.Processing
         viewModelScope.launch {
             val defaultWarranty = userPrefs.defaultWarrantyMonths.first()
-            val parsed = ocrEngine.parseFromText(rawText, defaultWarranty)
+            val defaultCurrency = userPrefs.defaultCurrency.first()
+            val parsed = ocrEngine.parseFromText(rawText, defaultWarranty, defaultCurrency)
             _scanStatus.value = ScanStatus.Success(parsed)
             populateReviewForm(parsed, null)
         }
@@ -282,6 +295,9 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
     fun resetState() {
         _scanStatus.value = ScanStatus.Idle
-        _reviewForm.value = ReviewFormState()
+        viewModelScope.launch {
+            val curr = userPrefs.defaultCurrency.first()
+            _reviewForm.value = ReviewFormState(currency = curr)
+        }
     }
 }

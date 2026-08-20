@@ -22,34 +22,34 @@ class ReceiptOcrEngine(private val context: Context) {
 
     private val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
 
-    suspend fun recognizeAndParse(bitmap: Bitmap, defaultWarrantyMonths: Int = 12): Result<ParsedReceipt> =
+    suspend fun recognizeAndParse(bitmap: Bitmap, defaultWarrantyMonths: Int = 12, defaultCurrency: String = "₹"): Result<ParsedReceipt> =
         withContext(Dispatchers.Default) {
             try {
                 val inputImage = InputImage.fromBitmap(bitmap, 0)
                 val rawText = recognizeText(inputImage)
-                val parsed = ReceiptParser.parse(rawText, defaultWarrantyMonths)
+                val parsed = ReceiptParser.parse(rawText, defaultWarrantyMonths, defaultCurrency)
                 Result.success(parsed)
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
 
-    suspend fun recognizeAndParse(uri: Uri, defaultWarrantyMonths: Int = 12): Result<ParsedReceipt> =
+    suspend fun recognizeAndParse(uri: Uri, defaultWarrantyMonths: Int = 12, defaultCurrency: String = "₹"): Result<ParsedReceipt> =
         withContext(Dispatchers.IO) {
             try {
                 val bitmap = loadBitmapFromUri(uri)
                 val inputImage = InputImage.fromBitmap(bitmap, 0)
                 val rawText = recognizeText(inputImage)
-                val parsed = ReceiptParser.parse(rawText, defaultWarrantyMonths)
+                val parsed = ReceiptParser.parse(rawText, defaultWarrantyMonths, defaultCurrency)
                 Result.success(parsed)
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
 
-    suspend fun parseFromText(rawText: String, defaultWarrantyMonths: Int = 12): ParsedReceipt =
+    suspend fun parseFromText(rawText: String, defaultWarrantyMonths: Int = 12, defaultCurrency: String = "₹"): ParsedReceipt =
         withContext(Dispatchers.Default) {
-            ReceiptParser.parse(rawText, defaultWarrantyMonths)
+            ReceiptParser.parse(rawText, defaultWarrantyMonths, defaultCurrency)
         }
 
     private suspend fun recognizeText(image: InputImage): String =

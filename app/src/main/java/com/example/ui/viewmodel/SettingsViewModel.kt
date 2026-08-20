@@ -73,6 +73,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun setDefaultCurrency(currency: String) {
         viewModelScope.launch {
             userPrefs.setDefaultCurrency(currency)
+            repository.updateAllCurrencies(currency)
         }
     }
 

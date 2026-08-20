@@ -32,7 +32,7 @@ object ReceiptParser {
         "dd/MM/yy"
     )
 
-    fun parse(rawText: String, defaultWarrantyMonths: Int = 12): ParsedReceipt {
+    fun parse(rawText: String, defaultWarrantyMonths: Int = 12, defaultCurrency: String = "₹"): ParsedReceipt {
         val lines = rawText.lines().map { it.trim() }.filter { it.isNotEmpty() }
         
         var merchantConfidence = 0.5f
@@ -46,7 +46,7 @@ object ReceiptParser {
         }
 
         // 2. Total Amount Extraction
-        val (amount, currency) = extractTotalAmount(lines).also { (amt, _) ->
+        val (amount, currency) = extractTotalAmount(lines, defaultCurrency).also { (amt, _) ->
             if (amt != null && amt > 0) amountConfidence = 0.90f
         }
 
@@ -149,8 +149,8 @@ object ReceiptParser {
         return clean.toDoubleOrNull()
     }
 
-    private fun normalizeCurrency(symbol: String?): String {
-        if (symbol == null || symbol.isEmpty()) return "₹"
+    private fun normalizeCurrency(symbol: String?, defaultCurrency: String = "₹"): String {
+        if (symbol == null || symbol.isEmpty()) return defaultCurrency
         val upper = symbol.trim().uppercase()
         return when {
             upper.contains("₹") || upper.contains("RS") || upper.contains("INR") || upper == "/-" -> "₹"
@@ -158,11 +158,11 @@ object ReceiptParser {
             upper.contains("€") -> "€"
             upper.contains("£") -> "£"
             upper.contains("¥") -> "¥"
-            else -> "₹"
+            else -> defaultCurrency
         }
     }
 
-    private fun extractTotalAmount(lines: List<String>): Pair<Double?, String> {
+    private fun extractTotalAmount(lines: List<String>, defaultCurrency: String = "₹"): Pair<Double?, String> {
         val totalKeywords = listOf(
             "GRAND TOTAL", "NET TOTAL", "TOTAL AMOUNT", "TOTAL DUE", "BALANCE DUE",
             "TOTAL", "AMOUNT DUE", "AMOUNT PAID", "INVOICE TOTAL", "SUBTOTAL"
@@ -179,16 +179,16 @@ object ReceiptParser {
                 if (upper.contains(keyword)) {
                     val matcher = amountPattern.matcher(line)
                     var lastFoundAmount: Double? = null
-                    var lastFoundSymbol = "₹"
+                    var lastFoundSymbol = defaultCurrency
                     while (matcher.find()) {
                         val prefixSymbol = matcher.group(1)
                         val postfixSymbol = matcher.group(3)
-                        val sym = prefixSymbol ?: postfixSymbol ?: "₹"
+                        val sym = prefixSymbol ?: postfixSymbol
                         val rawNum = matcher.group(2) ?: ""
                         val num = parseAmountString(rawNum)
                         if (num != null && num > 0) {
                             lastFoundAmount = num
-                            lastFoundSymbol = normalizeCurrency(sym)
+                            lastFoundSymbol = normalizeCurrency(sym, defaultCurrency)
                         }
                     }
                     if (lastFoundAmount != null) {
@@ -200,18 +200,18 @@ object ReceiptParser {
 
         // Fallback: find the largest amount in the document
         var maxAmount: Double? = null
-        var foundCurrency = "₹"
+        var foundCurrency = defaultCurrency
         for (line in lines) {
             val matcher = amountPattern.matcher(line)
             while (matcher.find()) {
                 val prefixSymbol = matcher.group(1)
                 val postfixSymbol = matcher.group(3)
-                val sym = prefixSymbol ?: postfixSymbol ?: "₹"
+                val sym = prefixSymbol ?: postfixSymbol
                 val rawNum = matcher.group(2) ?: ""
                 val num = parseAmountString(rawNum)
                 if (num != null && (maxAmount == null || num > maxAmount)) {
                     maxAmount = num
-                    foundCurrency = normalizeCurrency(sym)
+                    foundCurrency = normalizeCurrency(sym, defaultCurrency)
                 }
             }
         }
@@ -257,7 +257,7 @@ object ReceiptParser {
         val lower = rawText.lowercase()
 
         // 2 year / 3 years / 5 years warranty
-        val yearPattern = Regex("""(\d+)\s*(?:year|yr|years|yrs)\s*(?:limited\s*)?(?:warranty|guarantee|protection)""")
+        val yearPattern = Regex("""(\d+)\s*(?:year|yr|years|yrs)\s*(?:manufacturer\s*|standard\s*|apple\s*|brand\s*|limited\s*|extended\s*|store\s*)*(?:warranty|guarantee|protection)""")
         val yearMatch = yearPattern.find(lower)
         if (yearMatch != null) {
             val years = yearMatch.groupValues[1].toIntOrNull()
@@ -267,7 +267,7 @@ object ReceiptParser {
         }
 
         // Months pattern: 24 months / 6 months warranty
-        val monthPattern = Regex("""(\d+)\s*(?:month|mo|months|mos)\s*(?:limited\s*)?(?:warranty|guarantee|protection)""")
+        val monthPattern = Regex("""(\d+)\s*(?:month|mo|months|mos)\s*(?:manufacturer\s*|standard\s*|brand\s*|limited\s*|extended\s*|store\s*)*(?:warranty|guarantee|protection)""")
         val monthMatch = monthPattern.find(lower)
         if (monthMatch != null) {
             val months = monthMatch.groupValues[1].toIntOrNull()

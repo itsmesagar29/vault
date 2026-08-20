@@ -1,6 +1,7 @@
 package com.example.ui.components
 
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,7 +18,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.domain.model.ReceiptCategory
@@ -30,19 +33,26 @@ fun CategoryChips(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
+    val isDark = isSystemInDarkTheme()
 
     Row(
         modifier = modifier
             .fillMaxWidth()
             .horizontalScroll(scrollState)
-            .padding(horizontal = 4.dp),
+            .padding(horizontal = 2.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         // "All" Chip
         FilterChip(
             selected = selectedCategory == null,
             onClick = { onCategorySelected(null) },
-            label = { Text("All", fontSize = 12.sp) },
+            label = {
+                Text(
+                    text = "All",
+                    fontSize = 12.sp,
+                    fontWeight = if (selectedCategory == null) FontWeight.Bold else FontWeight.Medium
+                )
+            },
             leadingIcon = {
                 Icon(
                     imageVector = Icons.Default.Apps,
@@ -50,21 +60,38 @@ fun CategoryChips(
                     modifier = Modifier.size(16.dp)
                 )
             },
-            shape = RoundedCornerShape(12.dp),
+            shape = RoundedCornerShape(14.dp),
             colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = BrandPrimary.copy(alpha = 0.2f),
-                selectedLabelColor = BrandPrimary,
-                selectedLeadingIconColor = BrandPrimary
+                selectedContainerColor = BrandPrimary,
+                selectedLabelColor = Color.White,
+                selectedLeadingIconColor = Color.White,
+                containerColor = MaterialTheme.colorScheme.surface,
+                labelColor = MaterialTheme.colorScheme.onSurface
+            ),
+            border = FilterChipDefaults.filterChipBorder(
+                enabled = true,
+                selected = selectedCategory == null,
+                borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.3f else 0.5f),
+                selectedBorderColor = BrandPrimary,
+                borderWidth = 1.dp,
+                selectedBorderWidth = 1.dp
             ),
             modifier = Modifier.testTag("category_chip_all")
         )
 
         // Categories
         ReceiptCategory.entries.forEach { category ->
+            val isSelected = selectedCategory == category
             FilterChip(
-                selected = selectedCategory == category,
+                selected = isSelected,
                 onClick = { onCategorySelected(category) },
-                label = { Text(category.displayName, fontSize = 12.sp) },
+                label = {
+                    Text(
+                        text = category.displayName,
+                        fontSize = 12.sp,
+                        fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                    )
+                },
                 leadingIcon = {
                     Icon(
                         imageVector = category.icon,
@@ -72,14 +99,25 @@ fun CategoryChips(
                         modifier = Modifier.size(16.dp)
                     )
                 },
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(14.dp),
                 colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = BrandPrimary.copy(alpha = 0.2f),
-                    selectedLabelColor = BrandPrimary,
-                    selectedLeadingIconColor = BrandPrimary
+                    selectedContainerColor = BrandPrimary,
+                    selectedLabelColor = Color.White,
+                    selectedLeadingIconColor = Color.White,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    labelColor = MaterialTheme.colorScheme.onSurface
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = isSelected,
+                    borderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.3f else 0.5f),
+                    selectedBorderColor = BrandPrimary,
+                    borderWidth = 1.dp,
+                    selectedBorderWidth = 1.dp
                 ),
                 modifier = Modifier.testTag("category_chip_${category.name.lowercase()}")
             )
         }
     }
 }
+

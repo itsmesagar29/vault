@@ -33,7 +33,7 @@ class ReceiptParserTest {
         val parsed = ReceiptParser.parse(sampleText)
 
         assertEquals("Reliance Digital", parsed.merchantName)
-        assertEquals(29990.00, parsed.totalAmount, 0.01)
+        assertEquals(29990.00, parsed.totalAmount ?: 0.0, 0.01)
         assertEquals("₹", parsed.currency)
         assertEquals(24, parsed.warrantyMonths)
         assertEquals(ReceiptCategory.ELECTRONICS, parsed.category)
@@ -56,8 +56,24 @@ class ReceiptParserTest {
         val parsed = ReceiptParser.parse(sampleText)
 
         assertEquals("Croma", parsed.merchantName)
-        assertEquals(99900.00, parsed.totalAmount, 0.01)
+        assertEquals(99900.00, parsed.totalAmount ?: 0.0, 0.01)
         assertEquals(12, parsed.warrantyMonths)
+    }
+
+    @Test
+    fun parseReceipt_usesDefaultCurrency_whenNoSymbolInText() {
+        val sampleText = """
+            VIJAY SALES #481
+            Date: 2025-06-15
+            
+            Logitech MX Master 3S Mouse
+            TOTAL: 9999.00
+            1 Year Hardware Warranty
+        """.trimIndent()
+
+        val parsedInr = ReceiptParser.parse(sampleText)
+        assertEquals("₹", parsedInr.currency)
+        assertEquals(9999.00, parsedInr.totalAmount ?: 0.0, 0.01)
     }
 
     @Test

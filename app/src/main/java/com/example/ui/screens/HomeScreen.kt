@@ -3,6 +3,7 @@ package com.example.ui.screens
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,8 @@ import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Shield
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -53,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
@@ -88,6 +92,7 @@ fun HomeScreen(
     val vaultStats by viewModel.vaultStats.collectAsState()
     val expiringReceipts by viewModel.expiringSoonReceipts.collectAsState()
     val receipts by viewModel.filteredReceipts.collectAsState()
+    val isDark = isSystemInDarkTheme()
 
     var showSortMenu by remember { mutableStateOf(false) }
 
@@ -101,7 +106,7 @@ fun HomeScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp)
+                        .padding(start = 16.dp, end = 16.dp, top = 10.dp, bottom = 6.dp)
                 ) {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -111,59 +116,86 @@ fun HomeScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Box(
                                 modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(BrandPrimary.copy(alpha = 0.15f)),
+                                    .size(40.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(BrandPrimary.copy(alpha = if (isDark) 0.25f else 0.12f)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Shield,
                                     contentDescription = null,
                                     tint = BrandPrimary,
-                                    modifier = Modifier.size(22.dp)
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
-                            Spacer(modifier = Modifier.width(10.dp))
+                            Spacer(modifier = Modifier.width(12.dp))
                             Column {
                                 Text(
                                     text = stringResource(R.string.app_name),
                                     style = MaterialTheme.typography.titleLarge,
-                                    fontWeight = FontWeight.ExtraBold,
-                                    color = MaterialTheme.colorScheme.onBackground
+                                    fontWeight = FontWeight.Black,
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    letterSpacing = (-0.5).sp
                                 )
                                 Text(
-                                    text = "Receipt & Warranty Vault",
+                                    text = "Smart OCR & Warranty Manager",
                                     fontSize = 11.sp,
+                                    fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
 
-                        Row {
-                            IconButton(
-                                onClick = onNavigateToAnalytics,
-                                modifier = Modifier.testTag("nav_analytics_button")
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Analytics,
-                                    contentDescription = "Analytics",
-                                    tint = MaterialTheme.colorScheme.onSurface
+                        Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Surface(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.surface,
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.3f else 0.6f)
                                 )
+                            ) {
+                                IconButton(
+                                    onClick = onNavigateToAnalytics,
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .testTag("nav_analytics_button")
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Analytics,
+                                        contentDescription = "Analytics",
+                                        tint = BrandPrimary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
                             }
-                            IconButton(
-                                onClick = onNavigateToSettings,
-                                modifier = Modifier.testTag("nav_settings_button")
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Settings,
-                                    contentDescription = "Settings",
-                                    tint = MaterialTheme.colorScheme.onSurface
+
+                            Surface(
+                                shape = CircleShape,
+                                color = MaterialTheme.colorScheme.surface,
+                                border = androidx.compose.foundation.BorderStroke(
+                                    1.dp,
+                                    MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.3f else 0.6f)
                                 )
+                            ) {
+                                IconButton(
+                                    onClick = onNavigateToSettings,
+                                    modifier = Modifier
+                                        .size(38.dp)
+                                        .testTag("nav_settings_button")
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Settings,
+                                        contentDescription = "Settings",
+                                        tint = MaterialTheme.colorScheme.onSurface,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
                             }
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(10.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
 
                     // Search Bar
                     OutlinedTextField(
@@ -175,7 +207,7 @@ fun HomeScreen(
                         placeholder = {
                             Text(
                                 text = stringResource(R.string.search_placeholder),
-                                fontSize = 14.sp,
+                                fontSize = 13.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         },
@@ -183,7 +215,8 @@ fun HomeScreen(
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Search",
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                tint = BrandPrimary,
+                                modifier = Modifier.size(20.dp)
                             )
                         },
                         trailingIcon = {
@@ -192,16 +225,17 @@ fun HomeScreen(
                                     Icon(
                                         imageVector = Icons.Default.Clear,
                                         contentDescription = "Clear search",
-                                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             }
                         },
                         singleLine = true,
-                        shape = RoundedCornerShape(14.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
                             focusedBorderColor = BrandPrimary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.3f else 0.6f),
                             focusedContainerColor = MaterialTheme.colorScheme.surface,
                             unfocusedContainerColor = MaterialTheme.colorScheme.surface
                         )
@@ -215,6 +249,10 @@ fun HomeScreen(
                 containerColor = BrandPrimary,
                 contentColor = Color.White,
                 shape = RoundedCornerShape(18.dp),
+                elevation = androidx.compose.material3.FloatingActionButtonDefaults.elevation(
+                    defaultElevation = 6.dp,
+                    pressedElevation = 10.dp
+                ),
                 icon = {
                     Icon(
                         imageVector = Icons.Default.DocumentScanner,
@@ -225,7 +263,7 @@ fun HomeScreen(
                     Text(
                         text = "Scan Receipt",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
+                        fontSize = 14.sp
                     )
                 },
                 modifier = Modifier.testTag("scan_receipt_fab")
@@ -236,10 +274,10 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding),
-            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 88.dp),
-            verticalArrangement = Arrangement.spacedBy(14.dp)
+            contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 96.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Stats Section
+            // Stats Hero Section
             item {
                 StatSummaryCards(
                     stats = vaultStats,
@@ -248,7 +286,7 @@ fun HomeScreen(
                 )
             }
 
-            // Expiring Soon Priority Carousel (if any and not filtering out)
+            // Expiring Soon Priority Section
             if (uiState.searchQuery.isEmpty() && uiState.selectedCategory == null && uiState.selectedStatusFilter == null) {
                 item {
                     ExpiringSoonSection(
@@ -262,85 +300,16 @@ fun HomeScreen(
             item {
                 Column {
                     Text(
-                        text = "Categories",
+                        text = "Category Filter",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
-                    Spacer(modifier = Modifier.height(6.dp))
+                    Spacer(modifier = Modifier.height(8.dp))
                     CategoryChips(
                         selectedCategory = uiState.selectedCategory,
                         onCategorySelected = { viewModel.onCategorySelected(it) }
                     )
-                }
-            }
-
-            // Quick Warranty Status Filter Bar
-            item {
-                Column {
-                    Text(
-                        text = "Filter by Warranty Status",
-                        style = MaterialTheme.typography.titleSmall,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    Spacer(modifier = Modifier.height(6.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        // All Chip
-                        FilterChip(
-                            selected = uiState.selectedStatusFilter == null,
-                            onClick = { viewModel.onStatusFilterSelected(null) },
-                            label = { Text("All", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
-                            shape = RoundedCornerShape(10.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = BrandPrimary,
-                                selectedLabelColor = Color.White
-                            ),
-                            modifier = Modifier.weight(1f).testTag("status_filter_all")
-                        )
-
-                        // Active Chip
-                        FilterChip(
-                            selected = uiState.selectedStatusFilter == WarrantyStatus.ACTIVE,
-                            onClick = { viewModel.onStatusFilterSelected(WarrantyStatus.ACTIVE) },
-                            label = { Text("Active", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
-                            shape = RoundedCornerShape(10.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = StatusActive,
-                                selectedLabelColor = Color.White
-                            ),
-                            modifier = Modifier.weight(1f).testTag("status_filter_active")
-                        )
-
-                        // Expiring Soon Chip
-                        FilterChip(
-                            selected = uiState.selectedStatusFilter == WarrantyStatus.EXPIRING_SOON,
-                            onClick = { viewModel.onStatusFilterSelected(WarrantyStatus.EXPIRING_SOON) },
-                            label = { Text("Expiring", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
-                            shape = RoundedCornerShape(10.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = StatusExpiringSoon,
-                                selectedLabelColor = Color.White
-                            ),
-                            modifier = Modifier.weight(1f).testTag("status_filter_expiring")
-                        )
-
-                        // Expired Chip
-                        FilterChip(
-                            selected = uiState.selectedStatusFilter == WarrantyStatus.EXPIRED,
-                            onClick = { viewModel.onStatusFilterSelected(WarrantyStatus.EXPIRED) },
-                            label = { Text("Expired", fontSize = 12.sp, fontWeight = FontWeight.SemiBold) },
-                            shape = RoundedCornerShape(10.dp),
-                            colors = FilterChipDefaults.filterChipColors(
-                                selectedContainerColor = StatusExpired,
-                                selectedLabelColor = Color.White
-                            ),
-                            modifier = Modifier.weight(1f).testTag("status_filter_expired")
-                        )
-                    }
                 }
             }
 
@@ -352,20 +321,24 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "All Receipts (${receipts.size})",
+                        text = "Receipts & Records (${receipts.size})",
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
+                        fontWeight = FontWeight.ExtraBold,
                         color = MaterialTheme.colorScheme.onBackground
                     )
 
                     Box {
                         Surface(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(10.dp))
+                                .clip(RoundedCornerShape(12.dp))
                                 .clickable { showSortMenu = true }
                                 .testTag("sort_menu_button"),
-                            shape = RoundedCornerShape(10.dp),
-                            color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                            shape = RoundedCornerShape(12.dp),
+                            color = MaterialTheme.colorScheme.surface,
+                            border = androidx.compose.foundation.BorderStroke(
+                                1.dp,
+                                MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.3f else 0.6f)
+                            )
                         ) {
                             Row(
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
@@ -377,11 +350,11 @@ fun HomeScreen(
                                     tint = BrandPrimary,
                                     modifier = Modifier.size(16.dp)
                                 )
-                                Spacer(modifier = Modifier.width(4.dp))
+                                Spacer(modifier = Modifier.width(6.dp))
                                 Text(
                                     text = uiState.selectedSortOption.title,
                                     fontSize = 12.sp,
-                                    fontWeight = FontWeight.Medium,
+                                    fontWeight = FontWeight.SemiBold,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
@@ -433,12 +406,18 @@ fun EmptyVaultView(
     onScanClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isDark = isSystemInDarkTheme()
+
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 24.dp),
-        shape = RoundedCornerShape(20.dp),
-        color = MaterialTheme.colorScheme.surface
+            .padding(vertical = 16.dp),
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surface,
+        border = androidx.compose.foundation.BorderStroke(
+            1.dp,
+            MaterialTheme.colorScheme.outlineVariant.copy(alpha = if (isDark) 0.3f else 0.5f)
+        )
     ) {
         Column(
             modifier = Modifier.padding(28.dp),
@@ -446,20 +425,20 @@ fun EmptyVaultView(
         ) {
             Box(
                 modifier = Modifier
-                    .size(64.dp)
+                    .size(68.dp)
                     .clip(CircleShape)
-                    .background(BrandPrimary.copy(alpha = 0.15f)),
+                    .background(BrandPrimary.copy(alpha = 0.12f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ReceiptLong,
                     contentDescription = null,
                     tint = BrandPrimary,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(36.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = "No Receipts Found",
@@ -471,27 +450,30 @@ fun EmptyVaultView(
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Scan or upload your purchase receipts to track warranties, extract prices with OCR, and receive expiry reminders.",
+                text = "Scan or upload your purchase receipts to track warranties, extract prices with OCR, and receive automated expiry reminders.",
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                lineHeight = 18.sp
             )
 
-            Spacer(modifier = Modifier.height(18.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            ExtendedFloatingActionButton(
+            Button(
                 onClick = onScanClick,
-                containerColor = BrandPrimary,
-                contentColor = Color.White,
+                colors = ButtonDefaults.buttonColors(containerColor = BrandPrimary),
                 shape = RoundedCornerShape(14.dp),
-                icon = {
-                    Icon(
-                        imageVector = Icons.Default.DocumentScanner,
-                        contentDescription = null
-                    )
-                },
-                text = { Text("Scan First Receipt", fontWeight = FontWeight.Bold) }
-            )
+                modifier = Modifier.height(48.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DocumentScanner,
+                    contentDescription = null,
+                    modifier = Modifier.size(18.dp)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Scan First Receipt", fontWeight = FontWeight.Bold)
+            }
         }
     }
 }
+

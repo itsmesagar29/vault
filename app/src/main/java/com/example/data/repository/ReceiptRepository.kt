@@ -4,11 +4,14 @@ import android.content.Context
 import com.example.data.db.ReceiptDao
 import com.example.data.db.ReceiptDatabase
 import com.example.data.db.ReceiptEntity
+import com.example.data.preferences.UserPreferencesRepository
 import com.example.domain.model.ReceiptCategory
 import com.example.domain.model.ReceiptItem
 import com.example.domain.model.WarrantyStatus
 import com.example.domain.parser.ReceiptParser
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -24,6 +27,7 @@ data class VaultStats(
 
 class ReceiptRepository(private val context: Context) {
     private val dao: ReceiptDao = ReceiptDatabase.getDatabase(context).receiptDao()
+    private val userPrefs: UserPreferencesRepository = UserPreferencesRepository(context)
 
     val allReceipts: Flow<List<ReceiptItem>> = dao.getAllReceipts().map { list ->
         list.map { it.toDomain() }
@@ -43,7 +47,7 @@ class ReceiptRepository(private val context: Context) {
             .sortedBy { it.warrantyExpiryDateMillis }
     }
 
-    val vaultStats: Flow<VaultStats> = dao.getAllReceipts().map { list ->
+    val vaultStats: Flow<VaultStats> = combine(dao.getAllReceipts(), userPrefs.defaultCurrency) { list, prefCurrency ->
         val now = System.currentTimeMillis()
         val thirtyDaysFromNow = now + TimeUnit.DAYS.toMillis(30)
         val domainItems = list.map { it.toDomain() }
@@ -69,7 +73,7 @@ class ReceiptRepository(private val context: Context) {
             expiringSoonCount = expiring,
             expiredCount = expired,
             totalVaultValue = totalValue,
-            currency = domainItems.firstOrNull()?.currency ?: "₹"
+            currency = prefCurrency
         )
     }
 
@@ -108,9 +112,14 @@ class ReceiptRepository(private val context: Context) {
         dao.clearAllReceipts()
     }
 
+    suspend fun updateAllCurrencies(currency: String) {
+        dao.updateAllCurrencies(currency)
+    }
+
     suspend fun seedSampleReceiptsIfEmpty() {
         val now = System.currentTimeMillis()
         val cal = Calendar.getInstance()
+        val prefCurrency = userPrefs.defaultCurrency.first()
 
         // 1. Expiring soon item (purchased 23 months ago, 24 mo warranty -> expires in ~5 days)
         cal.timeInMillis = now
@@ -156,7 +165,7 @@ class ReceiptRepository(private val context: Context) {
                 category = ReceiptCategory.ELECTRONICS.name,
                 notes = "AppleCare+ 2-Year Protection Plan included. Covers accidental damage.",
                 imagePath = null,
-                rawOcrText = "APPLE BKC MUMBAI\nMACBOOK PRO 14-INCH M3 PRO\nAPPLECARE+ 2 YR WARRANTY\nSUBTOTAL: ₹1,99,900.00\nGST 18%: ₹35,982.00\nTOTAL: ₹2,35,882.00\nTHANK YOU FOR SHOPPING AT APPLE BKC",
+                rawOcrText = "APPLE BKC MUMBAI\nMACBOOK PRO 14-INCH M3 PRO\nAPPLECARE+ 2 YR WARRANTY\nTOTAL: ₹1,99,900.00\nTHANK YOU FOR SHOPPING AT APPLE BKC",
                 confidenceScore = 0.96f,
                 reminderEnabled = true,
                 reminderDaysBefore = 7,
@@ -172,7 +181,7 @@ class ReceiptRepository(private val context: Context) {
                 warrantyMonths = 24,
                 warrantyExpiryDateMillis = tvExpiry,
                 category = ReceiptCategory.APPLIANCES.name,
-                notes = "2-Year Comprehensive Manufacturer Warranty + 1 Year Extended Croma Shield.",
+                notes = "2-Year Comprehensive Manufacturer Warranty + Extended Protection Shield.",
                 imagePath = null,
                 rawOcrText = "CROMA ELECTRONICS #0412\nSONY 55 INCH BRAVIA 4K SMART TV\nMODEL: KD-55X74L\n2 YEAR EXTENDED WARRANTY INCLUDED\nTOTAL: ₹64,990.00\nINVOICE: CR-984122",
                 confidenceScore = 0.94f,
@@ -201,7 +210,7 @@ class ReceiptRepository(private val context: Context) {
             ),
             ReceiptEntity(
                 merchantName = "Vijay Sales",
-                itemName = "Bosch 8kg Front Load Washing Machine",
+                itemName = "Bosch 8kg Front Load Washer",
                 totalAmount = 36990.00,
                 currency = "₹",
                 purchaseDateMillis = drillPurchase,
@@ -218,7 +227,7 @@ class ReceiptRepository(private val context: Context) {
                 updatedAt = now
             ),
             ReceiptEntity(
-                merchantName = "Decathlon",
+                merchantName = "Decathlon India",
                 itemName = "Triban RC100 Road Bike",
                 totalAmount = 24999.00,
                 currency = "₹",
@@ -228,7 +237,7 @@ class ReceiptRepository(private val context: Context) {
                 category = ReceiptCategory.VEHICLES.name,
                 notes = "3-Month Free Service Checkup, Lifetime warranty on frame.",
                 imagePath = null,
-                rawOcrText = "DECATHLON SPORTS INDIA\nTRIBAN RC100 ROAD BIKE\nPRICE: ₹24,999.00\nGST INCLUDED\nTOTAL: ₹24,999.00\nKEEP INVOICE FOR WARRANTY",
+                rawOcrText = "DECATHLON SPORTS INDIA\nTRIBAN RC100 ROAD BIKE\nPRICE: ₹24,999.00\nTOTAL: ₹24,999.00\nKEEP INVOICE FOR WARRANTY",
                 confidenceScore = 0.88f,
                 reminderEnabled = true,
                 reminderDaysBefore = 7,
